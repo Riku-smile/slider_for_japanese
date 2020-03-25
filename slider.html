@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>slider</title>
+  <style lang="css" scoped>
+    .slider-outer{
+      position: relative;
+      /* お好みで変更してください */
+      width: 450px;
+      height: 300px;
+      margin: 0 auto 20px;
+      /* heightを指定しているため、はみ出た部分は表示させない設定にしています。こちらもお好みで */
+      overflow: hidden;
+    }
+    .slider-inner{
+      position: absolute;
+      /* お好みで変更してください　slide-outer以上にwidth, heightを設定することは推奨しておりません */
+      width: 450px;
+      height: 300px;
+    }
+    .slide-img {
+      /* お好みで変更してください　slide-outer以上にwidth, heightを設定することは推奨しておりません */
+      width: 450px;
+      height: 300px;
+      /* 画像のサイズを変更しています。詳しい説明は省略させて頂きます。 */
+      object-fit: content;
+    }
+    /* ボタンが横並びになるように配置しております。　slider.vueでは別の方法をご紹介しております。 */
+    .button {
+      display: block;
+      text-align: center;
+    }
+    button {
+      display:inline-block;
+      border-radius: 100%;
+      margin: 10px;
+    }
+    /* transition */
+    .prev-enter-active, .prev-leave-active,
+    .next-enter-active, .next-leave-active {
+      transform: translate(0px, 0px);
+      transition: transform 1500ms cubic-bezier(0, 0, 0.2, 1) 0ms; /*エフェクトが終了するまでの時間*/
+    }
+    /* 左から右へ */
+    .prev-enter, .next-leave-to {
+      transform: translateX(-100vw);
+    }
+    /* 右から左へ */
+    .next-enter, .prev-leave-to {
+      transform: translateX(100vw);
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- スライドの大枠を決める -->
+    <div class="slider-outer">
+      <!-- v-for文の適用　以下の部分が繰り返し表示される　:keyはslides[index].altでも良い -->
+      <div class="slider-inner" :key="index" v-for="(slide,index) in slides">
+        <!-- transitionの適用　ここより上だと正しく反映されない -->
+        <transition :name="slide_name">
+          <!-- v-if文の適用　index毎に表したいのでslides[index].hogeにする　:keyはslides[index].hogeでも良い -->
+          <img class="slide-img" :src="slides[index].img" :key="index" :alt="slides[index].alt" v-if="current_slide === index">
+          <!--
+          ex)
+          <a class="slide-a" :href="slides[index].href" :key="slides[index].text" v-if="current_slide === index">{{ slides[index].text }}</a>
+         -->
+        </transition>
+      </div>
+    </div>
+    <div class="button">
+      <button type="button" @click="prev()">前へ</button> <!-- @click=""はv-on:click=""でも良い -->
+      <button type="button" @click="next()">次へ</button>
+    </div>
+  </div>
+  <!-- CDNは公式サイトより本番用に変更してください -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+  //.html専用の記法
+    var app = new Vue ({
+      el: '#app',
+      data: {
+  //ここまで
+        autoPlay: null, //変数の中身を空にする
+        slide_name: 'next', //自動でスライドする時は右から左へ流すトランジションを適用する
+        current_slide: 0, //最初に表示される時は配列の一番最初の物を表示させる
+        slides: [
+          { img: './やる気のある人.png', alt: 'noimage' }, // '#'部分に相対パスを入れよう
+          { img: './握手.png', alt: 'noimage' }, // ex) '../assets/images/hoge.png'
+          { img: '#', alt: 'noimage' }
+        ]
+      },
+      methods: {
+        //スライダーの自動化
+        autoSlide(){
+          this.autoPlay = setInterval(() => {
+            this.current_slide = this.current_slide < this.slides.length - 1 ? this.current_slide + 1 : 0 ;
+            /*
+            if(this.current_slide < this.slides.length - 1){
+            this.current_slide + 1
+            }else{
+            this.current_slide = 0
+            }
+            */
+          },3000) //自動でスライドするまでの時間
+        },
+        //「前へ」ボタンの関数
+        prev () {
+          this.slide_name = 'prev' //スライドを左から右へ流すトランジションへ変更
+          if (this.current_slide === 0) { //current_slideが0のとき
+            this.current_slide = this.slides.length - 1 //current_slideを配列の一番最後へ戻す
+          } else { //current_slideが0ではない時
+            this.current_slide-- //current_slideから１を引く
+          }
+          clearInterval(this.autoPlay)
+        },
+        //「次へ」ボタンの関数
+        next () {
+          this.slide_name = 'next' //スライドを右から左へ流すトランジションへ変更
+          if (this.current_slide === this.slides.length - 1) { //current_slideが配列の数より多いとき
+            this.current_slide = 0 //current_slideを0へ戻す
+          } else { //current_slideが配列の数より少ない時
+            this.current_slide++ //current_slideに1を足す
+          }
+          clearInterval(this.autoPlay)
+          this.autoSlide()
+        }
+      },
+      mounted(){
+          this.autoSlide()
+      }
+    })
+  </script>
+</body>
+</html>
