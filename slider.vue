@@ -36,8 +36,8 @@ export default {
       current_slide: 0, //最初に表示される時は配列の一番最初の物を表示させる
       slides: [
         //require()はVueCLI限定の記法
-        { img: require('#'), alt: 'noimage' }, // '#'部分に相対パスを入れよう
-        { img: require('#'), alt: 'noimage' }, // ex) require('../assets/images/hoge.png')
+        { img: require('./images/やる気のある人.png'), alt: 'noimage' }, // '#'部分に相対パスを入れよう
+        { img: require('./imaegs/握手.png'), alt: 'noimage' }, // ex) require('../assets/images/hoge.png')
         { img: require('#'), alt: 'noimage' }
       ]
     }
